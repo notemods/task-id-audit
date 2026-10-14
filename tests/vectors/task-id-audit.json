@@ -1,0 +1,937 @@
+{
+ "slug": "task-id-audit",
+ "module": "products/task-id-audit/src/audit",
+ "function": "audit",
+ "cases": [
+  {
+   "name": "duplicate IDs retain two paths and lines",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "# Project\n- [ ] A 🆔 a1"
+     },
+     {
+      "path": "b.md",
+      "text": "- [ ] B 🆔 a1"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 2,
+    "tasks": 2,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "duplicate",
+      "ids": [
+       "a1"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 2
+       },
+       {
+        "path": "b.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "missing dependency names gone",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ gone"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "missing",
+      "ids": [
+       "gone"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "self reference is one warning",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 a1 ⛔ a1"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "self",
+      "ids": [
+       "a1"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "three node cycle is one component",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 a ⛔ b\n- [ ] B 🆔 b ⛔ c\n- [ ] C 🆔 c ⛔ a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 3,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "cycle",
+      "ids": [
+       "a",
+       "b",
+       "c"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       },
+       {
+        "path": "a.md",
+        "line": 2
+       },
+       {
+        "path": "a.md",
+        "line": 3
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "completed target resolves",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ b\n- [x] B 🆔 b"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "folder filter indexes Archive targets",
+   "args": [
+    [
+     {
+      "path": "Archive/b.md",
+      "text": "- [x] B 🆔 b"
+     },
+     {
+      "path": "Projects/a.md",
+      "text": "- [ ] A ⛔ b"
+     }
+    ],
+    "Projects"
+   ],
+   "expected": {
+    "folder": "Projects",
+    "files": 2,
+    "tasks": 2,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "fenced tasks and YAML are excluded",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "---\nx: 🆔 a\n---\n```md\n- [ ] hidden 🆔 a\n```\n- [ ] Real 🆔 a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "duplicate target has no cycle edge",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 a ⛔ b\n- [ ] B 🆔 b ⛔ a\n- [ ] B copy 🆔 b"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 3,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "ambiguous",
+      "ids": [
+       "b"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       },
+       {
+        "path": "a.md",
+        "line": 2
+       },
+       {
+        "path": "a.md",
+        "line": 3
+       }
+      ]
+     },
+     {
+      "kind": "duplicate",
+      "ids": [
+       "b"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 2
+       },
+       {
+        "path": "a.md",
+        "line": 3
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "stable path order",
+   "args": [
+    [
+     {
+      "path": "b.md",
+      "text": "- [ ] B 🆔 same"
+     },
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 same"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 2,
+    "tasks": 2,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "duplicate",
+      "ids": [
+       "same"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       },
+       {
+        "path": "b.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "ID alphabet includes upper digits underscore hyphen",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 A_9-z\n- [ ] B ⛔ A_9-z"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "IDs are case sensitive",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 Ab\n- [ ] B ⛔ ab"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "missing",
+      "ids": [
+       "ab"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 2
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "multiple dependency targets resolve",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ b, c\n- [ ] B 🆔 b\n- [ ] C 🆔 c"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 3,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "repeat target becomes one warning",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ gone,gone"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "missing",
+      "ids": [
+       "gone"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "task without ID still has dependencies",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ x\n- [ ] B"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "missing",
+      "ids": [
+       "x"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "ordered list and custom status",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "1. [/] A 🆔 a\n2) [x] B ⛔ a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "nested list task",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "  - [ ] A 🆔 a\n    * [ ] B ⛔ a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "tilde fence blocks IDs",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "~~~~\n- [ ] A 🆔 x\n~~~~\n- [ ] B 🆔 x"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "inline code and HTML comments do not make IDs",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A `🆔 x`\n<!--\n- [ ] Hidden 🆔 x\n-->\n- [ ] B 🆔 x"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 2,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "callout tasks are skipped",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "> - [ ] A 🆔 a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 0,
+    "complete": false,
+    "issues": [],
+    "skipped": [
+     {
+      "path": "a.md",
+      "line": 1,
+      "reason": "Unsupported task form or field outside a task"
+     }
+    ]
+   }
+  },
+  {
+   "name": "Dataview fields are skipped",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A [id:: a]"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 0,
+    "complete": false,
+    "issues": [],
+    "skipped": [
+     {
+      "path": "a.md",
+      "line": 1,
+      "reason": "Dataview fields are unsupported"
+     }
+    ]
+   }
+  },
+  {
+   "name": "bad ID punctuation is not truncated",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 bad.id"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 0,
+    "complete": false,
+    "issues": [],
+    "skipped": [
+     {
+      "path": "a.md",
+      "line": 1,
+      "reason": "Invalid ID or dependency field"
+     }
+    ]
+   }
+  },
+  {
+   "name": "repeated ID fields are skipped",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 a 🆔 b"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 0,
+    "complete": false,
+    "issues": [],
+    "skipped": [
+     {
+      "path": "a.md",
+      "line": 1,
+      "reason": "Repeated ID or dependency field"
+     }
+    ]
+   }
+  },
+  {
+   "name": "invalid comma list is skipped",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ b,"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 0,
+    "complete": false,
+    "issues": [],
+    "skipped": [
+     {
+      "path": "a.md",
+      "line": 1,
+      "reason": "Invalid ID or dependency field"
+     }
+    ]
+   }
+  },
+  {
+   "name": "incomplete index gives unresolved targets",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A ⛔ b\n> - [ ] B 🆔 b"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": false,
+    "issues": [
+     {
+      "kind": "unresolved",
+      "ids": [
+       "b"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": [
+     {
+      "path": "a.md",
+      "line": 2,
+      "reason": "Unsupported task form or field outside a task"
+     }
+    ]
+   }
+  },
+  {
+   "name": "folder boundary excludes similar prefix",
+   "args": [
+    [
+     {
+      "path": "Projects-old/a.md",
+      "text": "- [ ] A ⛔ gone"
+     }
+    ],
+    "Projects"
+   ],
+   "expected": {
+    "folder": "Projects",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "cross folder cycle retains source context",
+   "args": [
+    [
+     {
+      "path": "Archive/b.md",
+      "text": "- [ ] B 🆔 b ⛔ a"
+     },
+     {
+      "path": "Projects/a.md",
+      "text": "- [ ] A 🆔 a ⛔ b"
+     }
+    ],
+    "Projects"
+   ],
+   "expected": {
+    "folder": "Projects",
+    "files": 2,
+    "tasks": 2,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "cycle",
+      "ids": [
+       "a",
+       "b"
+      ],
+      "sources": [
+       {
+        "path": "Projects/a.md",
+        "line": 1
+       },
+       {
+        "path": "Archive/b.md",
+        "line": 1
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "CRLF keeps physical lines",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "# A\r\n\r\n- [ ] A ⛔ x"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "missing",
+      "ids": [
+       "x"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 3
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "two independent cycles",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- [ ] A 🆔 a ⛔ b\n- [ ] B 🆔 b ⛔ a\n- [ ] C 🆔 c ⛔ d\n- [ ] D 🆔 d ⛔ c"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 4,
+    "complete": true,
+    "issues": [
+     {
+      "kind": "cycle",
+      "ids": [
+       "a",
+       "b"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 1
+       },
+       {
+        "path": "a.md",
+        "line": 2
+       }
+      ]
+     },
+     {
+      "kind": "cycle",
+      "ids": [
+       "c",
+       "d"
+      ],
+      "sources": [
+       {
+        "path": "a.md",
+        "line": 3
+       },
+       {
+        "path": "a.md",
+        "line": 4
+       }
+      ]
+     }
+    ],
+    "skipped": []
+   }
+  },
+  {
+   "name": "fence markers in HTML comments do not hide real tasks",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "<!--\n```\n-->\n- [ ] A 🆔 a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "list nested fenced tasks are excluded",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- ```md\n  - [ ] hidden 🆔 a\n  ```\n- [ ] A 🆔 a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "indented nested fences exclude fields",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "- A list\n    ```md\n    - [ ] hidden 🆔 a\n    ```\n- [ ] A 🆔 a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  },
+  {
+   "name": "quoted fences exclude task fields",
+   "args": [
+    [
+     {
+      "path": "a.md",
+      "text": "> ```md\n> - [ ] hidden 🆔 a\n> ```\n- [ ] A 🆔 a"
+     }
+    ],
+    ""
+   ],
+   "expected": {
+    "folder": "",
+    "files": 1,
+    "tasks": 1,
+    "complete": true,
+    "issues": [],
+    "skipped": []
+   }
+  }
+ ]
+}

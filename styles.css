@@ -1,0 +1,39 @@
+.task-id-audit-modal {
+	width: min(920px, 94vw);
+}
+
+.task-id-audit-intro {
+	color: var(--text-muted);
+}
+
+.task-id-audit-status {
+	color: var(--text-accent);
+	font-size: var(--font-ui-large);
+	font-weight: var(--font-semibold);
+}
+
+.task-id-audit-card {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	padding: var(--size-4-3);
+	margin: var(--size-4-2) 0;
+}
+
+.task-id-audit-source {
+	display: block;
+	margin-top: var(--size-4-2);
+	max-width: 100%;
+	height: auto;
+	white-space: normal;
+	text-align: start;
+	overflow-wrap: anywhere;
+}
+
+.task-id-audit-warning {
+	color: var(--text-warning);
+}
+
+.task-id-audit-snapshot {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}

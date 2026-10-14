@@ -1,0 +1,74 @@
+[
+  {
+    "feature": "duplicates",
+    "caption": "Duplicate and ambiguous ID groups retain source paths.",
+    "note": "Projects/Duplicates/Release.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); const m = p.openAudit('Task ID Audit/Projects/Duplicates'); await m.refresh(); return m.report.issues.length; })()",
+    "wait": 500
+  },
+  {
+    "feature": "targets",
+    "caption": "A missing target and a self reference appear together.",
+    "note": "Projects/Targets/Links.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); const m = p.openAudit('Task ID Audit/Projects/Targets'); await m.refresh(); return m.report.issues.length; })()",
+    "wait": 500
+  },
+  {
+    "feature": "cycles",
+    "caption": "One cycle group contains three source tasks.",
+    "note": "Projects/Cycles/Launch.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); const m = p.openAudit('Task ID Audit/Projects/Cycles'); await m.refresh(); return m.report.issues.length; })()",
+    "wait": 500
+  },
+  {
+    "feature": "folder",
+    "caption": "The project task resolves a completed target in Archive.",
+    "note": "Projects/Resolved/Build.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); const m = p.openAudit('Task ID Audit/Projects/Resolved'); await m.refresh(); return m.report.issues.length; })()",
+    "wait": 500
+  },
+  {
+    "feature": "source",
+    "caption": "Select a source to open its task line.",
+    "note": "Projects/Targets/Links.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); p.modal?.close(); await p.openSource({ path: 'Task ID Audit/Projects/Targets/Links.md', line: 5 }); return 'source open'; })()",
+    "wait": 500
+  },
+  {
+    "feature": "profiles",
+    "caption": "Pro saves a project profile and an audit snapshot.",
+    "note": "Projects/Cycles/Launch.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.opts.http = async () => ({ status: 200, json: { data: { viewer: { login: 'demo-reader' }, user: { sponsorshipForViewerAsSponsor: { isActive: true, isOneTimePayment: false, tier: { name: '$5 a month', monthlyPriceInCents: 500 } } } } } }); app.secretStorage.setSecret('task-id-audit-github-token', 'gho_' + '0'.repeat(36)); await p.pro.refreshNow(); p.settings = { profiles: [], reports: [] }; const m = p.openAudit('Task ID Audit/Projects/Cycles'); await m.refresh(); await p.saveProfile('Launch review', m.folder); await p.saveReport('Launch review', m.report); m.updatePro(); return 'profile and report saved'; })()",
+    "after": "app.plugins.plugins['task-id-audit'].pro.signOut(); 'ok'",
+    "wait": 500
+  },
+  {
+    "feature": "repeat",
+    "caption": "Pro can repeat a report after Markdown file changes.",
+    "note": "Projects/Targets/Links.md",
+    "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.opts.http = async () => ({ status: 200, json: { data: { viewer: { login: 'demo-reader' }, user: { sponsorshipForViewerAsSponsor: { isActive: true, isOneTimePayment: false, tier: { name: '$5 a month', monthlyPriceInCents: 500 } } } } } }); app.secretStorage.setSecret('task-id-audit-github-token', 'gho_' + '0'.repeat(36)); await p.pro.refreshNow(); const m = p.openAudit('Task ID Audit/Projects/Targets'); await m.refresh(); m.live = true; m.updatePro(); return 'repeat on'; })()",
+    "after": "app.plugins.plugins['task-id-audit'].pro.signOut(); 'ok'",
+    "wait": 500
+  },
+  {
+    "feature": "task-id-audit",
+    "caption": "Audit sample tasks and open a source line.",
+    "frames": [
+      {
+        "note": "Projects/Duplicates/Release.md",
+        "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); const m = p.openAudit('Task ID Audit/Projects/Duplicates'); await m.refresh(); return m.report.issues.length; })()",
+        "hold": 1600
+      },
+      {
+        "note": "Projects/Cycles/Launch.md",
+        "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); const m = p.openAudit('Task ID Audit/Projects/Cycles'); await m.refresh(); return m.report.issues.length; })()",
+        "hold": 1600
+      },
+      {
+        "note": "Projects/Targets/Links.md",
+        "eval": "(async () => { const p = app.plugins.plugins['task-id-audit']; p.pro.signOut(); p.modal?.close(); await p.openSource({ path: 'Task ID Audit/Projects/Targets/Links.md', line: 5 }); return 'source open'; })()",
+        "hold": 1600
+      }
+    ]
+  }
+]
