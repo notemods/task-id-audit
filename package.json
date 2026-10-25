@@ -1,5 +1,6 @@
 {
 	"name": "task-id-audit",
+	"repository": {"type": "git", "url": "theluckystrike/task-id-audit.git"},
 	"version": "1.0.0",
 	"private": true,
 	"description": "Find duplicate task IDs, missing dependency targets, and dependency cycles.",
