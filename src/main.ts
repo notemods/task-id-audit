@@ -2,10 +2,14 @@ import { MarkdownView, Modal, Notice, Plugin, Setting, TFile, normalizePath } fr
 import type { SponsorsManager } from './license/index';
 import { createGitHubSponsors } from './license/github-obsidian';
 import { audit, folderPath, LIMITS, type Issue, type Note, type Report, type Skipped, type Source } from './audit';
-import { SPONSORS, bindPro, isPro, onProChange, resetPro } from './pro';
+import { SPONSORS, bindPro, isPro, onProChange, proNotice, resetPro } from './pro';
 import { DEFAULT_SETTINGS, normalizeSettings, TaskIdAuditSettingTab, type TaskIdAuditSettings } from './settings';
+import { setupHello } from './hello/index';
+import WHATS_NEW from './whats-new.json';
 
 const LABELS: Record<Issue['kind'], string> = { duplicate: 'Duplicate ID', missing: 'Missing target', ambiguous: 'Ambiguous target', self: 'Self reference', cycle: 'Dependency cycle', unresolved: 'Unresolved target (incomplete index)' };
+/** A control name with the Pro mark, the same as in the README and What's new. */
+function proLabel(text: string): string { return `${text} (Pro)`; }
 export function reportText(report: Report): string {
  const lines = [report.complete ? 'Complete audit' : 'Incomplete audit', `Folder: ${report.folder || '(vault)'}`, `${report.files} files indexed; ${report.tasks} tasks; ${report.issues.length} groups`, ''];
  for (const issue of report.issues) lines.push(`${LABELS[issue.kind]}: ${issue.ids.join(', ')}`, ...issue.sources.map((s) => `  ${s.path}:${s.line}`));
@@ -20,6 +24,8 @@ export default class TaskIdAuditPlugin extends Plugin {
  private unloaded = false;
  private snapshots = new Set<Modal>();
  async onload(): Promise<void> {
+  // First: "What's new" reads its state before the settings load (packages/hello). It does not wait.
+  setupHello(this, WHATS_NEW);
   this.unloaded = false;
   await this.loadSettings();
   const pro = createGitHubSponsors(this.app, this.manifest.id, SPONSORS, this); pro.init(); this.pro = pro; bindPro(pro);
@@ -126,9 +132,19 @@ export class AuditModal extends Modal {
  }
  updatePro(): void {
   const el = this.proControls; if (!el) return; el.empty(); if (!isPro()) this.live = false;
-  new Setting(el).setName('Repeat after file changes (pro)').setDesc('While this report is open, repeat after a Markdown file changes.')
-   .addToggle((t) => t.setValue(this.live).setDisabled(!isPro()).onChange((value) => { this.live = isPro() && value; }));
-  const saved = new Setting(el).setName('Project profiles and reports (pro)');
+  new Setting(el).setName(proLabel('Repeat after file changes')).setDesc('While this report is open, repeat after a Markdown file changes.')
+   .addToggle((t) => t.setValue(this.live).onChange((value) => {
+    if (value && !isPro()) {
+     // A free user can select the toggle: the shared notice shows what Pro adds and how to get it. Repeat stays off.
+     proNotice('Repeat after file changes is a Pro feature.');
+     // Obsidian does not draw a focused control again. Move the focus out, then draw the Pro rows again.
+     const active = this.contentEl.ownerDocument.activeElement as HTMLElement | null;
+     if (active && this.contentEl.contains(active)) active.blur();
+     this.live = false; this.updatePro(); return;
+    }
+    this.live = isPro() && value;
+   }));
+  const saved = new Setting(el).setName(proLabel('Project profiles and reports'));
   if (!isPro()) { saved.setDesc('Pro adds named folder profiles and the last five saved reports. Free checks have the same audit rules.'); return; }
   saved.addText((t) => t.setValue(this.name).onChange((v) => { this.name = v; }))
    .addButton((b) => b.setButtonText('Save profile').onClick(async () => { if (await this.plugin.saveProfile(this.name, normalizePath(this.folder.trim()))) this.updatePro(); }))

@@ -1,0 +1,27 @@
+{
+	"id": "task-id-audit",
+	"name": "Task ID Audit",
+	"version": "1.0.1",
+	"changes": [
+		"The Repeat after file changes (Pro) toggle now shows free users a notice with a Sponsor on GitHub button."
+	],
+	"tip": "Enter a folder path to limit the report visibility to that project folder.",
+	"thanks": "Hi, I am Michael, a solo developer in Poland. Task ID Audit is one of over 100 small plugins that I make. Thank you for using it to keep your tasks in order.",
+	"related": [
+		{
+			"id": "kanban-embed",
+			"name": "Kanban Embed",
+			"blurb": "Use a Kanban board inside a project or daily note."
+		},
+		{
+			"id": "task-format-bridge",
+			"name": "Task Format Bridge",
+			"blurb": "Preview and convert task date fields between emoji and Dataview syntax."
+		},
+		{
+			"id": "bases-task-rows",
+			"name": "Bases Task Rows",
+			"blurb": "Shows each checklist task in the notes a base selects as its own row, with due dates, tags and the source note, and ticks tasks from the view."
+		}
+	]
+}

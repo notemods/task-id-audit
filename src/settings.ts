@@ -2,6 +2,7 @@ import { PluginSettingTab, type SettingDefinitionItem } from 'obsidian';
 import { sponsorsSettingItems } from './license/github-obsidian';
 import { PRO_UI } from './pro';
 import type TaskIdAuditPlugin from './main';
+import { helloSettingItems } from './hello/settings';
 export interface Profile { name: string; folder: string }
 export interface SavedReport { name: string; text: string }
 export interface TaskIdAuditSettings { profiles: Profile[]; reports: SavedReport[] }
@@ -17,6 +18,11 @@ export class TaskIdAuditSettingTab extends PluginSettingTab {
  plugin: TaskIdAuditPlugin;
  constructor(app: ConstructorParameters<typeof PluginSettingTab>[0], plugin: TaskIdAuditPlugin) { super(app, plugin); this.plugin = plugin; }
  getSettingDefinitions(): SettingDefinitionItem[] {
+  // The product rows, then the "More from NoteMods" card (packages/hello).
+  return [...this.productSettingDefinitions(), ...helloSettingItems()];
+ }
+
+ productSettingDefinitions(): SettingDefinitionItem[] {
   return [
    { name: 'Read-only audit', desc: 'Run Task ID Audit: Open audit from the command palette. The folder filter changes the report. Targets come from the vault.' },
    ...(this.plugin.pro ? sponsorsSettingItems(this.plugin.pro, PRO_UI) : []),

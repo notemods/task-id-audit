@@ -48,7 +48,7 @@ Enter a name to save the current folder as a project profile. Load profile opens
 
 ### Repeat after file changes (Pro)
 
-Turn on Repeat after file changes while the report is open. Markdown file creation, edits, deletion, and renames schedule another scan after a short quiet period. Changes outside the report folder also matter because they can add or remove a target. Closing the report turns repeat off. A profile stores the folder, not the repeat toggle.
+Turn on Repeat after file changes while the report is open. Markdown file creation, edits, deletion, and renames schedule another scan after a short quiet period. Changes outside the report folder also matter because they can add or remove a target. Closing the report turns repeat off. A profile stores the folder, not the repeat toggle. Without Pro, the toggle shows a notice with a Sponsor on GitHub button and stays off.
 
 <img src="https://raw.githubusercontent.com/theluckystrike/task-id-audit/HEAD/docs/repeat.png" alt="Open audit with repeat after file changes enabled" width="720">
 
@@ -63,6 +63,8 @@ Open the command palette and run Task ID Audit: Open audit. Leave Report folder 
 YAML frontmatter and fenced code do not supply tasks. Inline code and HTML comments are excluded. Callout tasks, Dataview ID fields, malformed fields, and ID fields outside ordinary task lines appear under Skipped input. An incomplete scan labels absent targets as unresolved, because skipped input could contain them.
 
 ## Settings
+
+After a minor or major update, this plugin opens one What's new tab in the background. The tab and settings card suggest other NoteMods plugins and Zovo Chat and link to notemods.com for feedback ([privacy](https://notemods.com/privacy/)). The tab sends no data. Turn the tab off in Settings.
 
 The plugin settings tab contains the GitHub account controls for optional Pro access. Folder, repeat, and save controls are in the report window. Profile names, folder paths, and saved report text stay in the plugin data for the vault. Closing a report does not save a snapshot.
 
