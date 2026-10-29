@@ -1,6 +1,6 @@
 import { MarkdownView, Modal, Notice, Plugin, Setting, TFile, normalizePath } from 'obsidian';
 import type { SponsorsManager } from './license/index';
-import { createGitHubSponsors } from './license/github-obsidian';
+import { createGitHubSponsors, redrawKeepFocus } from './license/github-obsidian';
 import { audit, folderPath, LIMITS, type Issue, type Note, type Report, type Skipped, type Source } from './audit';
 import { SPONSORS, bindPro, isPro, onProChange, proNotice, resetPro } from './pro';
 import { DEFAULT_SETTINGS, normalizeSettings, TaskIdAuditSettingTab, type TaskIdAuditSettings } from './settings';
@@ -117,6 +117,8 @@ export class AuditModal extends Modal {
  private generation = 0;
  private results: HTMLElement | null = null;
  private proControls: HTMLElement | null = null;
+ /** The last Pro notice of this modal. The same notice does not show again while it is open. */
+ private notice: Notice | null = null;
  private name = '';
  constructor(readonly plugin: TaskIdAuditPlugin, folder: string) { super(plugin.app); this.folder = folderPath(folder); }
  onOpen(): void {
@@ -136,11 +138,10 @@ export class AuditModal extends Modal {
    .addToggle((t) => t.setValue(this.live).onChange((value) => {
     if (value && !isPro()) {
      // A free user can select the toggle: the shared notice shows what Pro adds and how to get it. Repeat stays off.
-     proNotice('Repeat after file changes is a Pro feature.');
-     // Obsidian does not draw a focused control again. Move the focus out, then draw the Pro rows again.
-     const active = this.contentEl.ownerDocument.activeElement as HTMLElement | null;
-     if (active && this.contentEl.contains(active)) active.blur();
-     this.live = false; this.updatePro(); return;
+     // One notice at a time: a repeated key on the focused toggle adds no new notice while the last one is open.
+     if (!this.notice?.messageEl.isConnected) this.notice = proNotice('Repeat after file changes is a Pro feature.');
+     // Draw the Pro rows again, so the toggle shows off. The keyboard focus goes to the new toggle of the same row.
+     this.live = false; redrawKeepFocus({ containerEl: el, update: () => this.updatePro() }); return;
     }
     this.live = isPro() && value;
    }));

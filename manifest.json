@@ -1,7 +1,7 @@
 {
 	"id": "task-id-audit",
 	"name": "Task ID Audit",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "1.13.4",
 	"description": "Find duplicate task IDs, missing dependency targets, and dependency cycles.",
 	"author": "Michael Lip",
