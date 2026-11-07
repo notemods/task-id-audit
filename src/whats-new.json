@@ -1,11 +1,11 @@
 {
 	"id": "task-id-audit",
 	"name": "Task ID Audit",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"changes": [
+		"The Pro notice of Task ID Audit now says that one payment turns on Pro in every NoteMods plugin.",
 		"The Repeat after file changes (Pro) toggle now keeps the keyboard focus after a free user turns it on.",
-		"More refused changes in the same audit window show no new Pro notice while the first notice is open.",
-		"The Repeat after file changes (Pro) toggle now shows free users a notice with a Sponsor on GitHub button."
+		"More refused changes in the same audit window show no new Pro notice while the first notice is open."
 	],
 	"tip": "Enter a folder path to limit the report visibility to that project folder.",
 	"thanks": "Hi, I am Michael, a solo developer in Poland. Task ID Audit is one of over 100 small plugins that I make. Thank you for using it to keep your tasks in order.",

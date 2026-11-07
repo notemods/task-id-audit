@@ -3,10 +3,10 @@ import { pluginId } from './load';
 import type TaskIdAuditPlugin from '../../src/main';
 
 // A free user opens the audit from the command palette and selects "Repeat after file changes (Pro)". The shared
-// Pro notice must show, with a Sponsor on GitHub button that opens the Sponsors page with metadata_source=<plugin id>.
+// Pro notice must show, with a Sponsor on GitHub button that opens the one-time tab of the Sponsors page with metadata_source=<plugin id>.
 // Repeat stays off. A Pro user (simulated Sponsors check) turns Repeat on and gets no notice.
 const LEAD = 'Repeat after file changes is a Pro feature.';
-const PITCH = 'Sponsor on GitHub, then sign in from the plugin settings.';
+const PITCH = 'One payment turns on Pro in every NoteMods plugin. Sponsor on GitHub, then sign in from the plugin settings.';
 const TOGGLE = '.task-id-audit-modal .task-id-audit-pro .setting-item:first-child .checkbox-container';
 
 interface Shown { text: string; buttons: number }
@@ -69,7 +69,7 @@ describe(`${pluginId} Pro notice`, function () {
    try { (w.activeWindow.document.querySelector('.notice .pf-pro-notice-sponsor') as HTMLElement).click(); } finally { w.open = original; }
    return opened;
   });
-  expect(url).toBe(`https://github.com/sponsors/theluckystrike?metadata_source=${pluginId}`);
+  expect(url).toBe(`https://github.com/sponsors/theluckystrike?frequency=one-time&metadata_source=${pluginId}-all`);
  });
 
  it('turns Repeat on for a Pro user with no notice (simulated Sponsors check)', async () => {
