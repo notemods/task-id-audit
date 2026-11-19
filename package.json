@@ -1,6 +1,6 @@
 {
 	"name": "task-id-audit",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"private": true,
 	"description": "Find duplicate task IDs, missing dependency targets, and dependency cycles.",
 	"main": "main.js",
@@ -31,7 +31,7 @@
 		"@wdio/mocha-framework": "^9.32.0",
 		"esbuild": "^0.28.2",
 		"eslint": "^9.39.5",
-		"eslint-plugin-obsidianmd": "^0.4.2",
+		"eslint-plugin-obsidianmd": "^0.6.0",
 		"globals": "^17.13.0",
 		"happy-dom": "^20.14.6",
 		"jiti": "^2.7.0",

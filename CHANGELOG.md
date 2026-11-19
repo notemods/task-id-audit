@@ -1,5 +1,11 @@
 # task-id-audit
 
+## 1.0.4
+
+### Patch Changes
+
+- The Sponsor button now opens the NoteMods one-time tier.
+
 ## 1.0.3
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 {
 	"id": "task-id-audit",
 	"name": "Task ID Audit",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"changes": [
 		"The Pro notice of Task ID Audit now says that one payment turns on Pro in every NoteMods plugin.",
 		"The Repeat after file changes (Pro) toggle now keeps the keyboard focus after a free user turns it on.",
